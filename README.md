@@ -6,6 +6,7 @@ title: 关于如何在 Arch Linux 搭建一个 gdb + qemu 调试 Linux 内核
 ### ！！！注意！！！
 
 ### 只需要按照步骤从上往下，即可成功配置调试环境(部分有图解)
+### ！！！！！(全程在虚拟机的Arch Linux环境下)！！！ ！！
 ##
 
 ### Arch Linux 安装指南：
@@ -16,16 +17,27 @@ title: 关于如何在 Arch Linux 搭建一个 gdb + qemu 调试 Linux 内核
 
 ![]()
 
-### 调试内核需要准备:
+### 调试内核需要准备：
 - 镜像
-   - bzImage (x86_64)
-   - initramfs.img
+   - bzImage (x86_64) (这是内核的主要二进制映像文件，通常是Linux内核的可执行文件)
+   - initramfs.img (这是一个初始的根文件系统映像，通常包含一些必要的文件和工具，以便在启动时内核能够正确运行)
 - gdb
-   - x86_64版本
+   - x86_64版本 (version 13.2)
 - QEMU
-   - qemu-system-x86_64
+   - qemu-system-x86_64 (version 8.1.0)
 
-#### 首先安装所需要的软件包：
+### 附上编译成功的各软件版本信息：
+- GUN Make
+	- version 4.4.1
+- GNU gdb
+	- version 13.2
+- gcc
+	- version 13.2.1
+- QEMU
+	- version 8.1.0
+![](Imgs/99.png)
+
+#### 首先安装所需要的软件包(全程在虚拟机的Arch Linux环境下)：
 ```shell
 sudo pacman -Sy  gcc make flex bison bc sed cpio wget qemu gdb
 ```
@@ -43,7 +55,9 @@ wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.5.3.tar.xz
 
 #### 解压：
 ```shell
-tar -xf linux-6.5.3.tar.xz 
+tar -xf linux-6.5.3.tar.xz
+# -x： 表示提取文件 
+# -f： 后面跟着要提取的文件名
 ```
 #### 进入解压好的文件:
 ```shell
@@ -84,6 +98,8 @@ wget https://busybox.net/downloads/busybox-1.36.1.tar.bz2
 #### 解压：
 ```shell
 tar -xf busybox-1.36.1.tar.bz2
+# -x： 表示提取文件 
+# -f： 后面跟着要提取的文件名
 ```
 
 #### 进入解压完成的busybox文件夹：
@@ -123,7 +139,7 @@ mkdir bin && cd bin
 cp ~/workspace/file/busy-1.36.1/_install/bin/busybox .
 ```
 
-#### 返回 上级 文件夹 并且 创建 init 文件：
+#### 返回 上级 文件夹 并且 新建 init 文件：
 ```shell 
 cd .. && touch init
 ```
@@ -142,11 +158,18 @@ vim init
 
 /bin/busybox sh
 ```
+```
+补充(不需要插入该内容)：这是一个简单的Shell脚本，它使用了BusyBox工具。
+这个脚本的功能是在终端上显示欢迎消息 "Welcome to Linux"，
+然后启动一个新的BusyBox shell，使用户可以在其中输入其他命令。
+```
+
 
 
 #### 给 init 文件加执行权限 并且 进入 initramfs 文件夹：
 ```shell
 chmod +x init && cd ~/workspace/initramfs
+# chmod +x 这个命令给名为"init"的文件添加了可执行权限
 ```
 
 #### 创建 initramfs.img 镜像：
